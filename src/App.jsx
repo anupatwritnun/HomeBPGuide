@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
@@ -9,6 +10,7 @@ import './index.css'
 function App() {
   return (
     <Router>
+      <Analytics />
       <div className="app-container">
         <Navbar />
         <main className="main-content">
