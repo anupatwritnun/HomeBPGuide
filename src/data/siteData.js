@@ -1,8 +1,44 @@
-export const stats = {
+// Default stats (fallback if API fails)
+export const defaultStats = {
     totalUsers: 67,
     totalBPLogs: 163,
     totalAppointments: 44
 };
+
+// n8n webhook URL for fetching real stats
+const STATS_WEBHOOK_URL = 'https://n8n.srv1159869.hstgr.cloud/webhook/dailyupdate';
+
+// Fetch real stats from n8n webhook
+export async function fetchStats() {
+    try {
+        const response = await fetch(STATS_WEBHOOK_URL, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            console.warn('Stats API returned error, using defaults');
+            return defaultStats;
+        }
+
+        const data = await response.json();
+
+        // Map n8n field names to our expected format
+        return {
+            totalUsers: data.users_count ?? defaultStats.totalUsers,
+            totalBPLogs: data.bp_count ?? defaultStats.totalBPLogs,
+            totalAppointments: data.appt_count ?? defaultStats.totalAppointments
+        };
+    } catch (error) {
+        console.warn('Failed to fetch stats from n8n:', error.message);
+        return defaultStats;
+    }
+}
+
+// Keep backward compatibility - export stats as default values
+export const stats = defaultStats;
 
 export const features = [
     {

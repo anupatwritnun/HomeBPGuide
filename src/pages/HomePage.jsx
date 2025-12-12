@@ -1,6 +1,26 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { stats, features, reviews, aboutUs } from '../data/siteData';
+import { defaultStats, fetchStats, features, reviews, aboutUs } from '../data/siteData';
+
+// Hook to fetch real stats from n8n
+function useStats() {
+    const [stats, setStats] = useState(defaultStats);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        fetchStats()
+            .then(data => {
+                setStats(data);
+                setIsLoading(false);
+            })
+            .catch(() => {
+                setStats(defaultStats);
+                setIsLoading(false);
+            });
+    }, []);
+
+    return { stats, isLoading };
+}
 
 // Animated Counter Hook
 function useCountUp(end, duration = 2000, startOnView = true) {
@@ -233,6 +253,9 @@ function PhoneCarousel() {
 }
 
 function HomePage() {
+    // Fetch real stats from n8n webhook
+    const { stats } = useStats();
+
     const statsAnim = useScrollAnimation();
     const featuresAnim = useScrollAnimation();
     const phoneAnim = useScrollAnimation();
